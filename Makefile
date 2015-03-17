@@ -1,14 +1,13 @@
 EXE=main
 AIM=global_fun.o
-CC=gcc
+CC=g++
 LIB= -losscore -lcurl
 all: $(EXE)
-$(EXE): main.c $(AIM)
-	gcc -o $(EXE) main.c $(AIM) $(LIB) 
-global_fun.o: global_fun.c global_fun.h
-	gcc -c global_fun.c -o global_fun.o
+$(EXE): main.cpp $(AIM)
+	$(CC) -o $(EXE) $(AIM) main.cpp $(LIB) 
+global_fun.o: global_fun.cpp global_fun.h
+	$(CC) -c -o global_fun.o  global_fun.cpp
 clean: 
 	rm $(EXE) $(AIM)
-
 run: $(EXE)
 	./$(EXE)
