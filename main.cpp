@@ -15,18 +15,13 @@ static oss_client_t *client = client_initialize_with_endpoint(userInfo.getAccess
 //access_key: zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj
 int main()
 {
-    std::vector<std::string> bu;
-    bu.push_back("nihao");
-    bu.push_back("haha");
-    bu.push_back("nidaye");
     const char *retInfo = NULL;
     int cols = 0, lines = 0;
     getTerminalSize(cols, lines);
     printf("%d %d\n", cols, lines);
     unsigned short retCode;
-    printf("This is chy\n");
-    ossShowObject(bu, L_BLUE);
-    printf("This is chy\n");
+    curDir.setBucketName("bucket-haha");
+    //curDir.setDirName("bucket-haha/haha/");
     retCode = OssLs(client, curDir);
     if (retCode == OK) {
         printf("put object from file successfully.\n");
