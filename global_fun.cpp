@@ -90,7 +90,7 @@ static unsigned short LsObjectForOssLs(oss_client_t *client, current_dir &curren
     if(currentDir.getDirName().length() > 0)
         request->set_prefix(request, currentDir.getDirName().c_str());          //设置prefix
     request->set_delimiter(request, "/");      //设置delimiter
-    request->set_max_keys(request, 1);      //设置max_keys
+    request->set_max_keys(request, 100);      //设置max_keys
     //request->set_marker(request, "t");         //设置marker
 
     while(isTruncated){
