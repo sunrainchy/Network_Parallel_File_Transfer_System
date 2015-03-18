@@ -1,3 +1,4 @@
+
 #ifndef OSS_SHOW_H
 #define OSS_SHOW_H
 
@@ -28,6 +29,8 @@
 #define CLRLINE              "\r\e[K" //or "\e[1K\r"
 
 
+
+
 struct oss_color{
     public:
         oss_color(const char *color){
@@ -41,5 +44,5 @@ struct oss_color{
 typedef struct oss_color oss_color;
 
 void getTerminalSize(int &cols, int &lines);
-void ossShowObject(const char **str, int cols, int lines, oss_color oc);
+void ossShowObject(const std::vector<std::string> &str, oss_color oc);
 #endif

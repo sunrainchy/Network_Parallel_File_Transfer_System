@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <string>
+#include <vector>
 #include <ossc/client.h>
 
 #include "global_fun.h"
+#include "oss_show.h"
 
 user_info::user_info(string accessId, string accessKey, string endPoint):mAccessId(accessId), mAccessKey(accessKey), mEndPoint(endPoint)
 {
@@ -36,6 +38,8 @@ unsigned short OssMkdir(oss_client_t *client, string dirName, current_dir &curre
 unsigned short OssLs(oss_client_t *client, current_dir &currentDir)
 {
     unsigned short retCode;
+    int cols, lines;
+    std::vector<std::string> bucketNameList;
     if(currentDir.isBucketNameEmpty()){
         oss_owner_t *owner = NULL;
         int bucketNumber = 0;
@@ -44,12 +48,15 @@ unsigned short OssLs(oss_client_t *client, current_dir &currentDir)
         if(retCode == 0){
             if(bucketNumber != 0){
                 for(int i=0; i<bucketNumber; i++){
-                    printf("***********************************************************************\n");
-                    printf("bucket [%d] : \n", i);
-                    printf("name = %s\tcreate_date = %s\n", buckets[i]->get_name(buckets[i]), buckets[i]->get_create_date(buckets[i]));
-                    owner = buckets[i]->get_owner(buckets[i]);
-                    printf("id = %s\tdisplay_name = %s\n", owner->get_id(owner), owner->get_display_name(owner));
+                    //printf("***********************************************************************\n");
+                    //printf("bucket [%d] : \n", i);
+                    //printf("name = %s\tcreate_date = %s\n", buckets[i]->get_name(buckets[i]), buckets[i]->get_create_date(buckets[i]));
+                    //owner = buckets[i]->get_owner(buckets[i]);
+                    //printf("id = %s\tdisplay_name = %s\n", owner->get_id(owner), owner->get_display_name(owner));
+                    //Here is a bug for ossc
+                    bucketNameList.push_back(buckets[i]->get_create_date(buckets[i]));
                 }
+                ossShowObject(bucketNameList, L_BLUE);
             }else{
                 printf("Without any bucket\n");
             }

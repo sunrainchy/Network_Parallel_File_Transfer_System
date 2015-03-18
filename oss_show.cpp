@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <string>
+#include <vector>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <iostream>
@@ -20,14 +22,14 @@ void getTerminalSize(int &cols, int &lines)
     lines = ts.ws_row;
 #endif
 }
-void ossShowObject(const char **str, int cols, int lines, oss_color oc)
+void ossShowObject(const std::vector<std::string> &str, oss_color oc)
 {
-    if(NULL == str)
-        return ;
+    int cols, lines;
+    getTerminalSize(cols, lines);
     cols = std::max(1, cols);
     int maxLen = 1, tmp = 1;
-    for(int i=0; str[i]; i++){
-        tmp = strlen(str[i]);
+    for(int i=0; i < str.size(); i++){
+        tmp = str[i].length();
         maxLen = std::max(tmp, maxLen);
     }
     maxLen += 2;
@@ -37,8 +39,8 @@ void ossShowObject(const char **str, int cols, int lines, oss_color oc)
     sprintf(format, "%%-%ds", len);
     if(0 == num)
         num ++;
-    for(int i=0; str[i]; i++){
-        printf(format, str[i]);
+    for(int i=0; i < str.size(); i++){
+        printf(format, str[i].c_str());
         if((i + 1) % num == 0)
             printf("\n");
     }

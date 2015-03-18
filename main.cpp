@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <string.h>
+#include <string>
+#include <vector>
 #include <stdlib.h>
 #include "global_fun.h"
 #include "oss_show.h"
-
 static string prompt = "OSS$";
 static current_dir curDir;
 static user_info userInfo("wHt3iB4nqia2Bh7y", "zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj", "oss-cn-hangzhou-internal.aliyuncs.com");
@@ -14,21 +15,24 @@ static oss_client_t *client = client_initialize_with_endpoint(userInfo.getAccess
 //access_key: zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj
 int main()
 {
-    const char *bu[] = {"nihao", "nihaohao", "bushiba"};
+    std::vector<std::string> bu;
+    bu.push_back("nihao");
+    bu.push_back("haha");
+    bu.push_back("nidaye");
     const char *retInfo = NULL;
     int cols = 0, lines = 0;
     getTerminalSize(cols, lines);
     printf("%d %d\n", cols, lines);
     unsigned short retCode;
     printf("This is chy\n");
-    ossShowObject(bu, cols, lines, L_BLUE);
+    ossShowObject(bu, L_BLUE);
     printf("This is chy\n");
-    /*retCode = OssLs(client, curDir);
+    retCode = OssLs(client, curDir);
     if (retCode == OK) {
         printf("put object from file successfully.\n");
     } else {
         retInfo = oss_get_error_message_from_retcode(retCode);
         printf("%s\n", retInfo);
-    }*/
+    }
     return 0;
 }
