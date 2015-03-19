@@ -4,15 +4,25 @@
 #include <string>
 #include <vector>
 #include <ossc/client.h>
-
 #include "global_fun.h"
 #include "oss_show.h"
-
+using namespace std;
 user_info::user_info(string accessId, string accessKey, string endPoint):mAccessId(accessId), mAccessKey(accessKey), mEndPoint(endPoint)
 {
     // Nothing was here
 }
 
+
+
+void DrawOssPrompt(current_dir &currentDir)
+{
+    printf("OSS:~/");
+    if(!currentDir.isBucketNameEmpty())
+        printf("%s\/", currentDir.getBucketName().c_str());
+    if(!currentDir.isDirNameEmpty())
+        printf("%s",currentDir.getDirName().c_str());
+    printf("$ ");
+}
 
 unsigned short OssMkdir(oss_client_t *client, string dirName, current_dir &currentDir)
 {
@@ -154,4 +164,73 @@ unsigned short OssLs(oss_client_t *client, current_dir &currentDir)
         LsObjectForOssLs(client, currentDir);
     }
     return retCode;
+}
+
+
+unsigned short OssCd(oss_client_t *client, current_dir &currentDir, string dirName)
+{
+    //TODO check if the format of dirName is right or not
+    unsigned short retCode = 0;
+    if(dirName.empty()){
+        currentDir.clearAll();
+        return retCode;
+    }
+    int pos_1 = dirName.find_first_of(""), pos_2;
+    string bucketName, objectName;
+    if(0 == pos_1){ //Absolute path
+        pos_2 = dirName.find_first_of("/", 1);
+        if(pos_2 == -1){
+            bucketName = dirName.substr(1, dirName.length() - 1);
+            if(client_is_bucket_exist(client, bucketName.c_str())){
+                currentDir.clearAll();
+                currentDir.setBucketName(bucketName);
+            }
+        }
+        else{
+            objectName = dirName.substr(1, pos_2);
+            objectName = dirName.substr(pos_2 + 1, dirName.length() - 1);
+            if(isObjectExist(client, bucketName, objectName + "/")){
+                currentDir.clearAll();
+                currentDir.setBucketName(bucketName);
+                currentDir.setDirName(objectName + "/");
+            }
+        }
+    }else{
+        if(isObjectExist(client, currentDir.getBucketName(), dirName + "/")){
+            currentDir.setDirName(dirName + "/");
+        }
+    }
+    return 0;
+}
+bool isObjectExist(oss_client_t *client, string bucketName, string objectName)
+{
+    if(0 == objectName.length()){
+        return client_is_bucket_exist(client, bucketName.c_str());
+    }
+    bool ans = false;
+    unsigned short retcode;
+    oss_list_objects_request_t *request = list_objects_request_initialize();
+    request->set_bucket_name(request, bucketName.c_str());
+    request->set_prefix(request, objectName.c_str());
+    //request->set_delimiter(request, "/");      //设置delimiter
+    request->set_max_keys(request, 1);      //设置max_keys
+    //request->set_marker(request, "t");         //设置marker
+    oss_object_listing_t *object_listing = client_list_objects(client, request, &retcode);
+    if(retcode == 0) {
+        ans = object_listing->_counts_summaries > 0 || object_listing->_counts_common_prefixes > 0;
+    } else {
+        const char *retinfo = oss_get_error_message_from_retcode(retcode);
+        printf("error = %s\n", retinfo);
+    }
+    //释放空间 
+    if(object_listing != NULL) {
+        if(object_listing->summaries != NULL) {
+            for(int i = 0; i < object_listing->_counts_summaries; i++) {
+                object_summary_finalize((object_listing->summaries)[i]);
+            }
+            free(object_listing->summaries);
+        }
+        object_listing_finalize(object_listing);
+    }
+    return ans;
 }

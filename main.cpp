@@ -7,7 +7,6 @@
 #include "global_fun.h"
 #include "oss_show.h"
 using namespace std;
-static string prompt = "<->$";
 static current_dir curDir;
 static user_info userInfo("wHt3iB4nqia2Bh7y", "zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj", "oss-cn-hangzhou-internal.aliyuncs.com");
 
@@ -20,27 +19,32 @@ int main()
     const char *retInfo = NULL;
     string order;
     unsigned short retCode;
-    curDir.setBucketName("bucket-haha");
+    //curDir.setBucketName("bucket-haha");
     //curDir.setDirName("bucket-haha/haha/");
+    DrawOssPrompt(curDir);
     while(getline(cin, order)){
-        cout<<prompt;
         if("ls" == order){
             retCode = OssLs(client, curDir);
         }else if("cd" == order){
-
+            string dirName;
+            printf("Please input dirName: ");
+            cin>>dirName;
+            OssCd(client, curDir, dirName);
         }else if("mkdir" == order){
             string dirName;
             printf("Please input dirName:");
             cin>>dirName;
             retCode = OssMkdir(client, dirName, curDir);
+        }else if("exit" == order){
+            return 0;
         }
-
         if (retCode == OK) {
-            printf("put object from file successfully.\n");
+            printf("+Done.\n");
         } else {
             retInfo = oss_get_error_message_from_retcode(retCode);
             printf("%s\n", retInfo);
         }
+        DrawOssPrompt(curDir);
     }
     return 0;
 }

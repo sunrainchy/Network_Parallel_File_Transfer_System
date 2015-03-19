@@ -10,6 +10,14 @@ class current_dir{
         {
             return (0 == mBucketName.length());
         }
+        bool isDirNameEmpty() const
+        {
+            return (0 == mDirName.length());
+        }
+        bool isObjectNameEmpty() const
+        {
+            return (0 == mObjectName.length());
+        }
         const string &getBucketName() const 
         {
             return mBucketName;
@@ -22,17 +30,22 @@ class current_dir{
         {
             return mDirName;
         }
-        void setBucketName(string bucketName)
+        void setBucketName(const string &bucketName)
         {
             mBucketName = bucketName;
         }
-        void setObjectName(string objectName)
+        void setObjectName(const string &objectName)
         {
             mObjectName = objectName;
         }
-        void setDirName(string dirName)
+        void setDirName(const string &dirName)
         {
             mDirName = dirName;
+        }
+        void clearAll(){
+            mBucketName.clear();
+            mObjectName.clear();
+            mDirName.clear();
         }
     private:
         string mBucketName;
@@ -61,6 +74,10 @@ class user_info{
         string mEndPoint;
 };
 
+void DrawOssPrompt(current_dir &currentDir);
+
 unsigned short OssMkdir(oss_client_t *client, string dirName, current_dir &currentDir);
 unsigned short OssLs(oss_client_t *client, current_dir &currentDir);
+unsigned short OssCd(oss_client_t *client, current_dir &currentDir, string dirName);
+bool isObjectExist(oss_client_t *client, string bucketName, string objectName = "");
 #endif
