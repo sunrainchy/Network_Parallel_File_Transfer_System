@@ -8,7 +8,7 @@
 #include "oss_show.h"
 using namespace std;
 static current_dir curDir;
-static user_info userInfo("wHt3iB4nqia2Bh7y", "zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj", "oss-cn-hangzhou-internal.aliyuncs.com");
+static user_info userInfo("wHt3iB4nqia2Bh7y", "zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj", "oss-cn-hangzhou.aliyuncs.com");//oss-cn-hangzhou-internal.aliyuncs.com
 
 static oss_client_t *client = client_initialize_with_endpoint(userInfo.getAccessId().c_str(),\
         userInfo.getAccessKey().c_str(), userInfo.getEndPoint().c_str());
@@ -23,6 +23,7 @@ int main()
     //curDir.setDirName("bucket-haha/haha/");
     DrawOssPrompt(curDir);
     while(getline(cin, order)){
+		retCode = OK;
         if("ls" == order){
             retCode = OssLs(client, curDir);
         }else if("cd" == order){

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <ossc/client.h>
+
 #include "global_fun.h"
 #include "oss_show.h"
 using namespace std;
@@ -13,12 +14,29 @@ user_info::user_info(string accessId, string accessKey, string endPoint):mAccess
 }
 
 
+string SplitFileName(const string &str)
+{
+	int found = str.find_last_of("/");
+	return str.substr(found + 1);
+}
+
+string SplitDirName(const string &str)
+{
+	int found = str.find_last_of("/");
+	return str.substr(0, found);
+}
+
+string SplitFatherDirName(const string &dir)
+{
+	int found = dir.find_last_of("/", dir.length() - 2);
+	return dir.substr(0, found);
+}
 
 void DrawOssPrompt(current_dir &currentDir)
 {
     printf("OSS:~/");
     if(!currentDir.isBucketNameEmpty())
-        printf("%s\/", currentDir.getBucketName().c_str());
+        printf("%s/", currentDir.getBucketName().c_str());
     if(!currentDir.isDirNameEmpty())
         printf("%s",currentDir.getDirName().c_str());
     printf("$ ");
@@ -166,42 +184,37 @@ unsigned short OssLs(oss_client_t *client, current_dir &currentDir)
     return retCode;
 }
 
-
 unsigned short OssCd(oss_client_t *client, current_dir &currentDir, string dirName)
 {
-    //TODO check if the format of dirName is right or not
-    unsigned short retCode = 0;
-    if(dirName.empty()){
-        currentDir.clearAll();
-        return retCode;
-    }
-    int pos_1 = dirName.find_first_of(""), pos_2;
-    string bucketName, objectName;
-    if(0 == pos_1){ //Absolute path
-        pos_2 = dirName.find_first_of("/", 1);
-        if(pos_2 == -1){
-            bucketName = dirName.substr(1, dirName.length() - 1);
-            if(client_is_bucket_exist(client, bucketName.c_str())){
-                currentDir.clearAll();
-                currentDir.setBucketName(bucketName);
-            }
-        }
-        else{
-            objectName = dirName.substr(1, pos_2);
-            objectName = dirName.substr(pos_2 + 1, dirName.length() - 1);
-            if(isObjectExist(client, bucketName, objectName + "/")){
-                currentDir.clearAll();
-                currentDir.setBucketName(bucketName);
-                currentDir.setDirName(objectName + "/");
-            }
-        }
-    }else{
-        if(isObjectExist(client, currentDir.getBucketName(), dirName + "/")){
-            currentDir.setDirName(dirName + "/");
-        }
-    }
-    return 0;
+	if("." == dirName){
+		return 0;
+	}
+	if(".." == dirName){
+		if(currentDir.isDirNameEmpty()){
+			currentDir.clearAll();
+		}else{
+			currentDir.setDirName(SplitFatherDirName(currentDir.getDirName()));
+		}
+		return 0;
+	}
+	if(currentDir.isBucketNameEmpty()){
+		printf("%s\n", dirName.c_str());
+		if(client_is_bucket_exist(client, dirName.c_str())){
+			printf("YES");
+			currentDir.setBucketName(dirName);
+		}else{
+			printf("NO!");
+			currentDir.clearAll();
+		}
+	}else{
+		string objectName = currentDir.getDirName() + dirName + "/";
+        if(isObjectExist(client, currentDir.getBucketName(), objectName)){
+			currentDir.setDirName(objectName);
+		}
+	}
+	return 0;
 }
+
 bool isObjectExist(oss_client_t *client, string bucketName, string objectName)
 {
     if(0 == objectName.length()){

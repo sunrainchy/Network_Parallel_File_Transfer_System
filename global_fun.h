@@ -74,6 +74,9 @@ class user_info{
         string mEndPoint;
 };
 
+string SplitFileName(const string &str);
+string SplitDirName(const string &str);
+string SplitFatherDirName(const string &dir);
 void DrawOssPrompt(current_dir &currentDir);
 
 unsigned short OssMkdir(oss_client_t *client, string dirName, current_dir &currentDir);
