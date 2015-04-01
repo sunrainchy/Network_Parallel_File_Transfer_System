@@ -38,7 +38,19 @@ int main()
             retCode = OssMkdir(client, dirName, curDir);
         }else if("exit" == order){
             return 0;
-        }
+        }else if("touch" == order){
+			string objectName;
+			printf("Please input objectName:");
+			cin>>objectName;
+			retCode = OssTouch(client, curDir, objectName);
+		}else if("put" == order){
+			string objectName,localFileName;
+			printf("Please input objectName:");
+			cin>>objectName;
+			printf("Please input localFileName:");
+			cin>>localFileName;
+			retCode = OssPut(client, curDir, objectName, localFileName);
+		}
         if (retCode == OK) {
             printf("+Done.\n");
         } else {

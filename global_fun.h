@@ -83,4 +83,6 @@ unsigned short OssMkdir(oss_client_t *client, string dirName, current_dir &curre
 unsigned short OssLs(oss_client_t *client, current_dir &currentDir);
 unsigned short OssCd(oss_client_t *client, current_dir &currentDir, string dirName);
 bool isObjectExist(oss_client_t *client, string bucketName, string objectName = "");
+unsigned short OssTouch(oss_client_t *client, current_dir &currentDir, string objectName);
+unsigned short OssPut(oss_client_t *client, current_dir &currentDir, string objectName, string localFileName);
 #endif

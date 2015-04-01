@@ -247,3 +247,70 @@ bool isObjectExist(oss_client_t *client, string bucketName, string objectName)
     }
     return ans;
 }
+
+
+unsigned short OssTouch(oss_client_t *client, current_dir &currentDir, string objectName){
+	if(currentDir.isBucketNameEmpty()){
+		printf("Please create bucket first.\n");
+		return 1;
+	}
+	unsigned short retCode = 0;
+	string reObjName = currentDir.getDirName() + objectName;
+	char buffer[8];
+	memset(buffer, 0, sizeof(buffer));
+	oss_object_metadata_t *metadata = object_metadata_initialize(); 
+	metadata->set_content_type(metadata, "application/octet-stream");
+	metadata->set_cache_control(metadata, "no-cache");
+	metadata->set_content_encoding(metadata, "utf-8");
+	metadata->set_content_disposition(metadata, "attachment;");
+	metadata->set_content_length(metadata, 0);
+	client_put_object_from_buffer(client, currentDir.getBucketName().c_str(), \
+			reObjName.c_str(), buffer, metadata, &retCode);
+	return retCode;
+}
+
+
+
+unsigned short OssPut(oss_client_t *client, current_dir &currentDir, string objectName, string localFileName){
+	unsigned short retCode = 0;
+	if(currentDir.isBucketNameEmpty()){
+		printf("Please create bucket first.\n");
+		return 1;
+	}
+	string reObjName = currentDir.getDirName() + objectName;
+
+	FILE *fp = fopen(localFileName.c_str(), "r");
+	if (fp == NULL) {
+		fprintf(stderr, "error in opening file %s\n", localFileName.c_str());
+		return -1;
+	}
+
+	unsigned int file_len = oss_get_file_size(fp);
+#if 1
+	/* 初始化元信息，并设置相关属性 */
+	oss_object_metadata_t *metadata = object_metadata_initialize(); 
+	metadata->set_content_length(metadata, file_len);
+	metadata->set_content_type(metadata, "application/octet-stream");
+	metadata->set_cache_control(metadata, "no-cache");
+	metadata->set_content_encoding(metadata, "utf-8");
+	metadata->set_content_disposition(metadata, "attachment;");
+	metadata->set_expiration_time(metadata, "Thu, 13 Sep 2012 21:08:42 GMT");
+	/* 将本地文件上传到云服务器上 */
+	oss_put_object_result_t *result =
+		client_put_object_from_file(client, currentDir.getBucketName().c_str(), reObjName.c_str(), fp, metadata, &retCode);
+
+	if (metadata != NULL) object_metadata_finalize(metadata);
+#else 
+	oss_put_object_result_t *result =
+		client_put_object_from_file(client, bucket_name, key, fp, NULL, &retcode);
+#endif
+	if (retCode == OK) {
+		printf("Put object from file successfully.\n");
+	} else {
+		const char *retinfo = oss_get_error_message_from_retcode(retCode);
+		printf("%s\n", retinfo);
+	}
+	fclose(fp);
+
+	return retCode;
+}
