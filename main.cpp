@@ -8,12 +8,11 @@
 #include "oss_show.h"
 using namespace std;
 static current_dir curDir;
-static user_info userInfo("wHt3iB4nqia2Bh7y", "zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj", "oss-cn-hangzhou.aliyuncs.com");//oss-cn-hangzhou-internal.aliyuncs.com
+static user_info userInfo("wHt3iB4nqia2Bh7y", "your-access-key", "oss-cn-hangzhou.aliyuncs.com");//oss-cn-hangzhou-internal.aliyuncs.com
 
 static oss_client_t *client = client_initialize_with_endpoint(userInfo.getAccessId().c_str(),\
         userInfo.getAccessKey().c_str(), userInfo.getEndPoint().c_str());
-//access_id : wHt3iB4nqia2Bh7y
-//access_key: zzyzBuoBpU5eZKwP9mnzZD1vCpQhAj
+
 int main()
 {
     const char *retInfo = NULL;
